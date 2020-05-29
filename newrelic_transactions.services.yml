@@ -1,0 +1,5 @@
+services:
+  newrelic_transactions.event_subscriber:
+    class: '\Drupal\newrelic_transactions\EventSubscriber\EventSubscriber'
+    tags:
+      - { name: 'event_subscriber' }
