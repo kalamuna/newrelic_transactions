@@ -1,0 +1,6 @@
+{
+    "name": "kalamuna/newrelic_transactions",
+    "description": "Name transactions in New Relic based on route, entity bundle, and highest weight role.",
+    "type": "drupal-module",
+    "require": {}
+}
