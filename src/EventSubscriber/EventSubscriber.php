@@ -68,7 +68,7 @@ class EventSubscriber implements EventSubscriberInterface {
     newrelic_add_custom_parameter('user_roles', implode(', ', $user->getRoles()));
 
     // Not sharing username and mail by default to avoid data retention and privacy issues.
-    //newrelic_add_custom_parameter('user_name', $user->getUsername());
+    //newrelic_add_custom_parameter('user_name', $user->getAccountName());
     //newrelic_add_custom_parameter('user_mail', $user->getEmail());
   }
 }
