@@ -8,7 +8,7 @@
 namespace Drupal\newrelic_transactions\EventSubscriber;
 
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -28,7 +28,7 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * Specify the name of this transation in New Relic based on routing and user info.
    */
-  public function nameTransaction(GetResponseEvent $event) {
+  public function nameTransaction(RequestEvent $event) {
 
     // Only change New Relic data if New Relic is actually enabled.
     if (!extension_loaded('newrelic')) return;
@@ -57,7 +57,7 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * Specify the name of this transation in New Relic based on routing and user info.
    */
-  public function addAttributes(GetResponseEvent $event) {
+  public function addAttributes(RequestEvent $event) {
 
     // Only change New Relic data if New Relic is actually enabled.
     if (!extension_loaded('newrelic')) return;
