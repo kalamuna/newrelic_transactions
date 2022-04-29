@@ -23,7 +23,7 @@ class EventSubscriber implements EventSubscriberInterface {
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $config_factory;
+  protected $configFactory;
 
   /**
    * The entity type manager.
@@ -41,7 +41,7 @@ class EventSubscriber implements EventSubscriberInterface {
    *   The entity type manager.
    */
   public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager) {
-    $this->config_factory = $config_factory;
+    $this->configFactory = $config_factory;
     $this->entityTypeManager = $entity_type_manager;
   }
 
@@ -59,10 +59,12 @@ class EventSubscriber implements EventSubscriberInterface {
    */
   public function nameTransaction(RequestEvent $event) {
     // Only change New Relic data if New Relic is actually enabled.
-    if (!extension_loaded('newrelic')) return;
+    if (!extension_loaded('newrelic')) {
+      return;
+    }
 
     // Config object.
-    $config = $this->config_factory->get('newrelic_transactions.config');
+    $config = $this->configFactory->get('newrelic_transactions.config');
 
     // We are going to use the router path to name transactions.
     $route_match = \Drupal::routeMatch();
@@ -70,9 +72,9 @@ class EventSubscriber implements EventSubscriberInterface {
     $path = $route->getPath();
 
     // If this is an entity, replace the entity type with the bundle.
-    foreach($route_match->getParameters() as $key => $item) {
-      if(method_exists($item, 'bundle')) {
-        $path = str_replace('{'.$key.'}', '{'.$item->bundle().'}', $path);
+    foreach ($route_match->getParameters() as $key => $item) {
+      if (method_exists($item, 'bundle')) {
+        $path = str_replace('{' . $key . '}', '{' . $item->bundle() . '}', $path);
       }
     }
 
@@ -83,26 +85,30 @@ class EventSubscriber implements EventSubscriberInterface {
 
     // Roles that can be passed to New Relic.
     $transaction_roles = $config->get('transaction_roles');
+    $transaction_roles = array_filter($transaction_roles);
 
     // Filter roles by transaction roles from config.
-    $roles = array_filter($roles, function($role) use ($transaction_roles) {
-      return $transaction_roles[$role] ?? FALSE;
-    });
+    if (!empty($transaction_roles)) {
+      $roles = array_filter($roles, function ($role) use ($transaction_roles) {
+        return array_key_exists($role, $transaction_roles) ?? FALSE;
+      });
+    }
 
-    // We are going to prepend a role to the transaction name, since that can greatly affect performance.
+    // We are going to prepend a role to the transaction name,
+    // since that can greatly affect performance.
     $user_roles = \Drupal::currentUser()->getRoles();
 
     // Filter roles by what is set in config.
-    $user_roles = array_filter($roles, function($role) use ($user_roles) {
+    $user_roles = array_filter($roles, function ($role) use ($user_roles) {
       return in_array($role, $user_roles);
     });
     $user_roles = array_values($user_roles);
 
-    // Select the highest-weighted role for the current user. (This should probably become configurable.)
+    // Select the highest-weighted role for the current user.
     $transaction_role = array_pop($user_roles);
 
     // Tell New Relic to change the transaction name (without the starting /).
-    newrelic_name_transaction(substr($path, 1) . ' (' . $transaction_role .')');
+    newrelic_name_transaction(substr($path, 1) . ' (' . $transaction_role . ')');
   }
 
   /**
@@ -110,15 +116,18 @@ class EventSubscriber implements EventSubscriberInterface {
    */
   public function addAttributes(RequestEvent $event) {
     // Only change New Relic data if New Relic is actually enabled.
-    if (!extension_loaded('newrelic')) return;
+    if (!extension_loaded('newrelic')) {
+      return;
+    }
 
     // Config object.
-    $config = $this->config_factory->get('newrelic_transactions.config');
+    $config = $this->configFactory->get('newrelic_transactions.config');
 
     // Get user_data config.
     $user_data = $config->get('user_data');
 
-    // Track some data about the current user so we can identify who is having trouble.
+    // Track some data about the current user
+    // so we can identify who is having trouble.
     $user = \Drupal::currentUser();
 
     if ($user_data['id']) {
@@ -128,4 +137,5 @@ class EventSubscriber implements EventSubscriberInterface {
       newrelic_add_custom_parameter('user_roles', implode(', ', $user->getRoles()));
     }
   }
+
 }

@@ -1,7 +1,7 @@
 newrelic_transactions.config:
-  path: '/admin/config/system/newrelic-transactions'
+  path: '/admin/config/development/newrelic-transactions'
   defaults:
-    _title: 'New Relic Transactions.'
+    _title: 'New Relic Transactions'
     _form: 'Drupal\newrelic_transactions\Form\NewRelicTransactionsConfig'
   requirements:
     _permission: 'administer site configuration'

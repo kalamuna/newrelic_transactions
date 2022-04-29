@@ -68,38 +68,45 @@ class NewRelicTransactionsConfig extends ConfigFormBase {
     $config = $this->config('newrelic_transactions.config');
 
     if (!extension_loaded('newrelic')) {
-      \Drupal::messenger()->addError('New Relic extension not found');
+      \Drupal::messenger()->addError('The New Relic extension was not found on your server.');
     }
 
     // Create list of role options.
     $roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
-    $role_options = array_map(function($role) {
+    $role_options = array_map(function ($role) {
       return $role->label();
     }, $roles);
 
     // Create list of user data attribute options.
     $data_options = [
       'id' => 'ID',
-      'roles' => 'Roles',
+      'roles' => 'All Roles',
+    ];
+
+    // Module description for the top of the config page.
+    $form['description'] = [
+      '#markup' => $this->t('If New Relic is enabled on your server, this module will categorize transactions.'),
     ];
 
     // Roles to pass to transactions.
     $default = $config->get('transaction_roles');
     $form['transaction_roles'] = [
       '#type' => 'checkboxes',
-      '#title' => $this->t('Transaction Roles'),
+      '#title' => $this->t('Limit Roles'),
       '#default_value' => $default ?? NULL,
       '#options' => $role_options,
-      '#description' => $this->t('User\'s highest weight role will be used in the transaction. Go to <a href="/admin/people/roles">Roles</a> to reorder.'),
+      '#description' => $this->t('Leave blank for all roles. Transactions will be tagged with the user\'s highest weight role (lowest in this list). Go to <a href="/admin/people/roles">Roles</a> to reorder.'),
     ];
 
     // User data to pass as custom parameter.
     $default = $config->get('user_data');
+    $role_keys = array_keys($data_options);
     $form['user_data'] = [
       '#type' => 'checkboxes',
-      '#title' => $this->t('User Data Parameters'),
-      '#default_value' => $default ?? NULL,
+      '#title' => $this->t('Slow Transaction Data'),
+      '#default_value' => $default ?? array_combine($role_keys, $role_keys),
       '#options' => $data_options,
+      '#description' => $this->t('The selected information will be sent to help debug slow transactions.'),
     ];
 
     return $form;
