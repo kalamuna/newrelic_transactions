@@ -58,12 +58,13 @@ class EventSubscriber implements EventSubscriberInterface {
    * Specify the name of this transation in New Relic based on routing and user info.
    */
   public function nameTransaction(RequestEvent $event) {
+
     // Only change New Relic data if New Relic is actually enabled.
     if (!extension_loaded('newrelic')) {
       return;
     }
 
-    // Config object.
+    // Load the module configuration.
     $config = $this->configFactory->get('newrelic_transactions.config');
 
     // We are going to use the router path to name transactions.
@@ -78,34 +79,31 @@ class EventSubscriber implements EventSubscriberInterface {
       }
     }
 
-    // Load roles for role order.
-    $roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
-    $role_ids = array_keys($roles);
-    $roles = array_combine($role_ids, $role_ids);
+    // Get the roles that have been explicitly enabled for transaction naming.
+    $enabled_roles = $config->get('transaction_roles');
+    $enabled_roles = array_filter($enabled_roles);
 
-    // Roles that can be passed to New Relic.
-    $transaction_roles = $config->get('transaction_roles');
-    $transaction_roles = array_filter($transaction_roles);
-
-    // Filter roles by transaction roles from config.
-    if (!empty($transaction_roles)) {
-      $roles = array_filter($roles, function ($role) use ($transaction_roles) {
-        return array_key_exists($role, $transaction_roles) ?? FALSE;
-      });
+    // If no roles have been enabled, all system roles will be used.
+    if (empty($enabled_roles)) {
+      $system_roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
+      $enabled_roles = array_keys($system_roles);
     }
 
-    // We are going to prepend a role to the transaction name,
-    // since that can greatly affect performance.
+    // Get all of the current user's roles.
     $user_roles = \Drupal::currentUser()->getRoles();
 
-    // Filter roles by what is set in config.
-    $user_roles = array_filter($roles, function ($role) use ($user_roles) {
-      return in_array($role, $user_roles);
+    // Filter the user roles based on the roles that are enabled.
+    $user_roles = array_filter($user_roles, function ($role) use ($enabled_roles) {
+      return in_array($role, $enabled_roles);
     });
-    $user_roles = array_values($user_roles);
 
-    // Select the highest-weighted role for the current user.
+    // Since we can only append one role, choose the highest weighted one.
     $transaction_role = array_pop($user_roles);
+
+    // If the user does not have any enabled roles, set the role to other.
+    if (empty($transaction_role)) {
+      $transaction_role = "other";
+    }
 
     // Tell New Relic to change the transaction name (without the starting /).
     newrelic_name_transaction(substr($path, 1) . ' (' . $transaction_role . ')');
