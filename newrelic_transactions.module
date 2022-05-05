@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for New Relic Transactions module.
+ */
+
+ /**
+  * Implements hook_requirements().
+  */
+ function newrelic_transactions_requirements($phase) {
+  $requirements = array();
+
+  switch ($phase) {
+    // Requirements for status report page.
+    case 'runtime':
+      $requirement = [
+        'title' => t('New Relic Transations'),
+      ];
+
+      // If newrelic extension is not found on server.
+      if (!extension_loaded('newrelic')) {
+        // Set error message.
+        $requirement += [
+          'description' => t('The New Relic extension was not found on your server.'),
+          'severity' => REQUIREMENT_ERROR,
+        ];
+      }
+      else {
+        // If extension is found, set an OK status message.
+        $requirement += [
+          'description' => t('The New Relic extension was found on your server.'),
+          'severity' => REQUIREMENT_OK,
+        ];
+      }
+
+      // Add requirement to return array.
+      $requirements['newrelic_transactions'] = $requirement;
+      break;
+  }
+
+  return $requirements;
+}

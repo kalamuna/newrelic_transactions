@@ -1,5 +1,6 @@
 name: New Relic Transactions
 description: Name transactions in New Relic based on route, entity bundle, and highest weight role.
+configure: newrelic_transactions.config
 type: module
 core_version_requirement: ^8 || ^9
 version: 1.0.0-dev

@@ -1,0 +1,6 @@
+newrelic_transactions.config:
+  title: New Relic Transactions
+  description: Config for New Relic Transactions.
+  parent:  system.admin_config_development
+  route_name: newrelic_transactions.config
+  weight: 10

@@ -1,5 +1,8 @@
 services:
   newrelic_transactions.event_subscriber:
     class: '\Drupal\newrelic_transactions\EventSubscriber\EventSubscriber'
+    arguments:
+      - '@config.factory'
+      - '@entity_type.manager'
     tags:
       - { name: 'event_subscriber' }
