@@ -1,4 +1,4 @@
-# Newrelic Transactions
+# New Relic Transactions
 
 Drupal module for naming transactions in New Relic according to route, bundle, and role.
 
