@@ -1,6 +1,18 @@
 {
     "name": "kalamuna/newrelic_transactions",
     "description": "Name transactions in New Relic based on route, entity bundle, and highest weight role.",
+    "homepage": "https://github.com/kalamuna/newrelic_transactions",
+    "readme": "README.md",
+    "license": "GPL-2.0-or-later",
     "type": "drupal-module",
-    "require": {}
+    "authors": [
+        {
+            "name": "Mike McCaffrey",
+            "role": "Developer"
+        },
+        {
+            "name": "Kelly Jacobs",
+            "role": "Developer"
+        }
+    ]
 }
