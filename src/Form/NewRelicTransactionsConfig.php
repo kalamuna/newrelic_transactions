@@ -85,7 +85,9 @@ class NewRelicTransactionsConfig extends ConfigFormBase {
 
     // Module description for the top of the config page.
     $form['description'] = [
+      '#prefix' => '<p>',
       '#markup' => $this->t('If New Relic is enabled on your server, this module will categorize transactions.'),
+      '#suffix' => '</p>',
     ];
 
     // Roles to pass to transactions.
