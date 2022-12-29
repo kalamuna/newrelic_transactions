@@ -93,7 +93,7 @@ class NewRelicTransactionsConfig extends ConfigFormBase {
     $form['transaction_roles'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Limit Roles'),
-      '#default_value' => $default ?? NULL,
+      '#default_value' => $default ?? [],
       '#options' => $role_options,
       '#description' => $this->t('Leave blank for all roles. Transactions will be tagged with the user\'s highest weight role (lowest in this list). Go to <a href="/admin/people/roles">Roles</a> to reorder.'),
     ];

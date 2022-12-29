@@ -8,7 +8,6 @@
 namespace Drupal\newrelic_transactions\EventSubscriber;
 
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -56,8 +55,10 @@ class EventSubscriber implements EventSubscriberInterface {
 
   /**
    * Specify the name of this transation in New Relic based on routing and user info.
+   *
+   * @param $event The RequestEvent, which is not used, so the type is ignored.
    */
-  public function nameTransaction(RequestEvent $event) {
+  public function nameTransaction($event) {
 
     // Only change New Relic data if New Relic is actually enabled.
     if (!extension_loaded('newrelic')) {
@@ -111,8 +112,10 @@ class EventSubscriber implements EventSubscriberInterface {
 
   /**
    * Specify the name of this transation in New Relic based on routing and user info.
+   *
+   * @param $event The RequestEvent, which is not used, so the type is ignored.
    */
-  public function addAttributes(RequestEvent $event) {
+  public function addAttributes($event) {
     // Only change New Relic data if New Relic is actually enabled.
     if (!extension_loaded('newrelic')) {
       return;
